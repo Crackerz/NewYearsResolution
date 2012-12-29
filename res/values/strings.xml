@@ -6,5 +6,6 @@
     <string name="title_activity_calendar">Calendar</string>
     <string name="SwitchToCalendar">View Calendar</string>
     <string name="SwitchToTheTimer">View Timer</string>
+    <string name="title_activity_timer">Timer</string>
 
 </resources>
