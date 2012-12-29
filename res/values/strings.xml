@@ -1,0 +1,10 @@
+<resources>
+
+    <string name="app_name">New Years Resolution</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_calendar">Calendar</string>
+    <string name="SwitchToCalendar">View Calendar</string>
+    <string name="SwitchToTheTimer">View Timer</string>
+
+</resources>
