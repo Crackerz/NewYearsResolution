@@ -1,10 +1,10 @@
 package blankenship.william.NewYearsResolution;
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.SystemClock;
 import android.app.Activity;
 import android.content.Context;
-import android.text.format.Time;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -15,11 +15,28 @@ import android.widget.Toast;
 
 public class Timer extends Activity {
 	
+	/**
+	 * persistantData is a class that will be translated to and from
+	 * JSON for saving data when closing the app.<br><br>
+	 * 
+	 * All legacy versions should be supported when parsing JSON files.<br>
+	 * Version Log:<br>
+	 * v 0.1: added (time long) and (isStarted, isRunning boolean).<br>
+	 * 
+	 * @author Crackers
+	 */
+	public class persistantData {
+		public long time;
+		public boolean isStarted;
+		public boolean isRunning;
+	}
+	
 	Chronometer timer;
+	boolean isStarted=false;
+	boolean isRunning=false;
 	startListener startl = new startListener();
 	stopListener stopl = new stopListener();
-	long baseTime;
-	long pauseTime;
+	long time; //Used for pausing the timer.
 	Context c;
 	
     @Override
@@ -57,25 +74,64 @@ public class Timer extends Activity {
         start.setOnClickListener(startl);
         
         pause.setOnClickListener(stopl);
+        
+        fileOutput("test");
+    }
+    
+    @Override
+    public void onPause() {
+    	super.onPause();
+    	if(isStarted) {
+    		if(isRunning)
+    			time = timer.getBase();
+    	}
+    }
+    
+    @Override
+    public void onResume() {
+    	super.onResume();
+    	if(isStarted) {
+    		if(isRunning) {
+    			timer.setBase(time);
+    			timer.start();
+    		} else {
+    			timer.setBase(SystemClock.elapsedRealtime()-time);
+    			timer.setText(padTime(timer.getText().toString()));
+    		}
+    	}
+    }
+    
+    public void fileOutput(String contents) {
+    	//TODO Must handle 2 events. Media mounted AND media unaccessable
+    	String state = Environment.getExternalStorageState();
+    	Toast.makeText(c, state, Toast.LENGTH_SHORT).show();
     }
     
     public class startListener implements View.OnClickListener {
     	boolean firstCall=true;
 		public void onClick(View v) {
-			if(firstCall) {
-				timer.start();
-				firstCall = false;
-			} else {
-				timer.setBase(timer.getBase()+(SystemClock.elapsedRealtime()-pauseTime));
-				timer.start();
+			if(!isRunning) {
+				if(firstCall) {
+					timer.setBase(SystemClock.elapsedRealtime());
+					timer.start();
+					firstCall = false;
+					isStarted=true;
+				} else {
+					timer.setBase(SystemClock.elapsedRealtime()-time);
+					timer.start();
+				}
+				isRunning = true;
 			}
 		}
     }
     
     public class stopListener implements View.OnClickListener {
 		public void onClick(View v) {
-			pauseTime = SystemClock.elapsedRealtime();
-			timer.stop();
+			if(isRunning) {
+				time = SystemClock.elapsedRealtime() - timer.getBase();
+				timer.stop();
+				isRunning = false;
+			}
 		}
     }
 
@@ -98,7 +154,7 @@ public class Timer extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_timer, menu);
+        //getMenuInflater().inflate(R.menu.activity_timer, menu);
         return true;
     }
 }
