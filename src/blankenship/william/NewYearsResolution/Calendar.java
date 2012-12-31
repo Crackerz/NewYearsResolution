@@ -2,23 +2,64 @@ package blankenship.william.NewYearsResolution;
 
 /**
  * The calendar class is used to store accrued time in the calendar.
- * Keeps up to two years worth of data.
+ * Keeps up to one year worth of data.
  * @author Crackers
  *
  */
 public class Calendar {
 
-	private int lastYear[];
+
+	int year = 2012;
+	
 	private int thisYear[];
 	
-	public void main() {
-		for(int i = 0; i < 12; i++) {
-			getDaysInMonth(i,2012);
+	public static void main(String args[]) {
+		for(int y = 2012; y < 2012 + 2000; y++) {
+			Calendar test = new Calendar(y);
+			int offset=1;
+			for(int i = 0; i < 12; i++) {
+				for(int j = 1; j <= test.getDaysInMonth(i,y); j++) {
+					test.thisYear[test.getIndex(j,i,y)] = offset++;
+				}
+			}
+			offset = 1;
+			for(int i = 0; i < test.thisYear.length; i++) {
+				if(offset!=test.thisYear[i]) {
+					System.out.println("Error in year " + y);
+					System.exit(0);
+				}
+				offset++;
+				System.out.print(test.thisYear[i]+",");
+			}
+			System.out.println();
 		}
 	}
 	
-	private void newYear() {
-		
+	public Calendar() {
+		thisYear = new int[getDaysInYear(year)];
+	}
+	
+	public Calendar(int year) {
+		thisYear = new int[getDaysInYear(year)];
+	}
+	
+	/**
+	 * Gets the array index of a day in a month in a year.
+	 */
+	private int getIndex(int day, int month, int year) {
+		return (getMonthOffset(month,year)+day)-1;
+	}
+	
+	private int getMonthOffset(int month, int year) {
+		int result = 0;
+		for(int i = 0; i < month; i++) {
+			result+=getDaysInMonth(i,year);
+		}
+		return result;
+	}
+	
+	private int getDaysInYear(int year) {
+		return (isLeapYear(year)) ? 366 : 365;
 	}
 	
 	/**
@@ -38,7 +79,7 @@ public class Calendar {
 	}
 	
 	private boolean isLeapYear(int year) {
-		return (year%4==0&&year%100!=0||year%400==0);
+		return ((year%4==0&&year%100!=0)||(year%400==0));
 	}
 
 }
