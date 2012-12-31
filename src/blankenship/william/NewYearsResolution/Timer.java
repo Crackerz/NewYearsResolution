@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Calendar;
 
 import com.google.gson.Gson;
 
@@ -38,11 +39,16 @@ public class Timer extends Activity {
 		public long jsonTime;
 		public boolean jsonStarted;
 		public boolean jsonRunning;
+		public AppCalendar jsonCalendar;
+		int day;
+		int month;
+		int year;
 		
-		public PersistantData(long time, boolean isStarted, boolean isRunning) {
+		public PersistantData(long time, boolean isStarted, boolean isRunning, AppCalendar calendar, int day, int month, int year) {
 			jsonTime = time;
 			jsonStarted = isStarted;
 			jsonRunning = isRunning;
+			jsonCalendar = calendar;
 		}
 	}
 	
@@ -50,6 +56,11 @@ public class Timer extends Activity {
 	boolean isStarted=false;
 	boolean isRunning=false;
 	boolean startlFirstCall=true;
+	Calendar date = Calendar.getInstance();
+	int day = date.get(Calendar.DAY_OF_MONTH);
+	int month = date.get(Calendar.MONTH);
+	int year = date.get(Calendar.YEAR);
+	AppCalendar calendar = new AppCalendar(year);
 	startListener startl = new startListener();
 	stopListener stopl = new stopListener();
 	long time; //Used for pausing the timer.
@@ -63,6 +74,10 @@ public class Timer extends Activity {
         
         //Import any previous data
         loadFile();
+        
+        if(this.year!=calendar.getYear()) {
+        	calendar.setYear(year);
+        }
         
         //Initialize Variables
         final CalendarView cal = (CalendarView) this.findViewById(R.id.calendarView);
@@ -79,7 +94,7 @@ public class Timer extends Activity {
         cal.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
 			public void onSelectedDayChange(CalendarView view, int year, int month,
 					int dayOfMonth) {
-				calText.setText((month+1)+"/"+dayOfMonth+"/"+year);
+				calText.setText("Goal: 2 Hours\nAccomplished: "+calendar.getValue(dayOfMonth, month, year)/3600000.0 + " Hours");
 			}
 		});
         
@@ -87,6 +102,21 @@ public class Timer extends Activity {
 			public void onChronometerTick(Chronometer chronometer) {
 				String value = timer.getText().toString();
 		        timer.setText(padTime(value));
+		        date = Calendar.getInstance();
+		        int nday = date.get(Calendar.DAY_OF_MONTH);
+		        int nmonth = date.get(Calendar.MONTH);
+		        int nyear = date.get(Calendar.YEAR);
+		        if(day!=nday||month!=nmonth||year!=nyear) {
+		        	Toast.makeText(c, "New Day!", Toast.LENGTH_LONG).show();
+			        calendar.updateValue(getTime(), day, month, year);
+		        	day = nday;
+		        	month = nmonth;
+		        	year = nyear;
+		        	if(year!=calendar.getYear())
+		        		calendar.setYear(year);
+		        	timer.setBase(SystemClock.elapsedRealtime());
+		        }
+		        calendar.updateValue(getTime(), nday, nmonth, nyear);
 			}
 		});
         
@@ -103,7 +133,7 @@ public class Timer extends Activity {
     			time = timer.getBase();
     	}
     	Gson gson = new Gson();
-    	PersistantData data = new PersistantData(time,isStarted,isRunning);
+    	PersistantData data = new PersistantData(time,isStarted,isRunning, calendar,day,month,year);
     	String json = gson.toJson(data);
     	fileOutput(json);
     }
@@ -121,6 +151,10 @@ public class Timer extends Activity {
     			timer.setText(padTime(timer.getText().toString()));
     		}
     	}
+    }
+    
+    private long getTime() {
+    	return SystemClock.elapsedRealtime() - timer.getBase();
     }
     
     public void fileOutput(String contents) {
@@ -168,6 +202,10 @@ public class Timer extends Activity {
 				time = data.jsonTime;
 				isStarted = data.jsonStarted;
 				isRunning = data.jsonRunning;
+				calendar = data.jsonCalendar;
+				day = data.day;
+				month = data.month;
+				year = data.year;
 			} catch (FileNotFoundException e) {
 				Toast.makeText(c, "Could not find data file", Toast.LENGTH_SHORT).show();
 			} catch (IOException e) {
