@@ -1,5 +1,14 @@
 package blankenship.william.NewYearsResolution;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+
+import com.google.gson.Gson;
+
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
@@ -16,7 +25,7 @@ import android.widget.Toast;
 public class Timer extends Activity {
 	
 	/**
-	 * persistantData is a class that will be translated to and from
+	 * PersistantData is a class that will be translated to and from
 	 * JSON for saving data when closing the app.<br><br>
 	 * 
 	 * All legacy versions should be supported when parsing JSON files.<br>
@@ -25,15 +34,22 @@ public class Timer extends Activity {
 	 * 
 	 * @author Crackers
 	 */
-	public class persistantData {
-		public long time;
-		public boolean isStarted;
-		public boolean isRunning;
+	public class PersistantData {
+		public long jsonTime;
+		public boolean jsonStarted;
+		public boolean jsonRunning;
+		
+		public PersistantData(long time, boolean isStarted, boolean isRunning) {
+			jsonTime = time;
+			jsonStarted = isStarted;
+			jsonRunning = isRunning;
+		}
 	}
 	
 	Chronometer timer;
 	boolean isStarted=false;
 	boolean isRunning=false;
+	boolean startlFirstCall=true;
 	startListener startl = new startListener();
 	stopListener stopl = new stopListener();
 	long time; //Used for pausing the timer.
@@ -44,6 +60,9 @@ public class Timer extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timer);
         c=this;
+        
+        //Import any previous data
+        loadFile();
         
         //Initialize Variables
         final CalendarView cal = (CalendarView) this.findViewById(R.id.calendarView);
@@ -74,8 +93,6 @@ public class Timer extends Activity {
         start.setOnClickListener(startl);
         
         pause.setOnClickListener(stopl);
-        
-        fileOutput("test");
     }
     
     @Override
@@ -85,11 +102,16 @@ public class Timer extends Activity {
     		if(isRunning)
     			time = timer.getBase();
     	}
+    	Gson gson = new Gson();
+    	PersistantData data = new PersistantData(time,isStarted,isRunning);
+    	String json = gson.toJson(data);
+    	fileOutput(json);
     }
     
     @Override
     public void onResume() {
     	super.onResume();
+    	loadFile();
     	if(isStarted) {
     		if(isRunning) {
     			timer.setBase(time);
@@ -102,19 +124,65 @@ public class Timer extends Activity {
     }
     
     public void fileOutput(String contents) {
-    	//TODO Must handle 2 events. Media mounted AND media unaccessable
     	String state = Environment.getExternalStorageState();
-    	Toast.makeText(c, state, Toast.LENGTH_SHORT).show();
+    	//If mounted use external storage
+    	if(state.equals(Environment.MEDIA_MOUNTED)) {
+    		File root = Environment.getExternalStorageDirectory();
+    		File file = new File(root,"/newYears/");
+    		try {
+    			if(!file.mkdirs()) {
+    				Toast.makeText(c, "Failed to create directories", Toast.LENGTH_SHORT);
+    			}
+    			file = new File(file,"data.json");
+    			if(!file.exists()) {
+    				file.createNewFile();
+    			}
+    			FileOutputStream fout = new FileOutputStream(file);
+				fout.write(contents.getBytes());
+			} catch (FileNotFoundException e) {
+				Toast.makeText(c, "File "+file.getAbsolutePath()+" not found!", Toast.LENGTH_SHORT).show();
+			} catch (IOException e) {
+				Toast.makeText(c, e.getMessage(), Toast.LENGTH_SHORT).show();
+			}
+    	}
+    }
+    
+    public void loadFile() {
+    	String state = Environment.getExternalStorageState();
+    	if(state.equals(Environment.MEDIA_MOUNTED)) {
+    		File root = Environment.getExternalStorageDirectory();
+    		File file = new File(root,"/newYears/data.json");
+    		BufferedReader fin;
+			try {
+				fin = new BufferedReader(new FileReader(file));
+				String json = "";
+				while(true) {
+					String nextLine;
+					nextLine = fin.readLine();
+					if(nextLine==null) break;
+					json+=nextLine;
+				}
+				Gson parse = new Gson();
+				PersistantData data = (PersistantData)parse.fromJson(json, PersistantData.class);
+				startlFirstCall = false;
+				time = data.jsonTime;
+				isStarted = data.jsonStarted;
+				isRunning = data.jsonRunning;
+			} catch (FileNotFoundException e) {
+				Toast.makeText(c, "Could not find data file", Toast.LENGTH_SHORT).show();
+			} catch (IOException e) {
+				Toast.makeText(c, "Problem encountered while reading data file", Toast.LENGTH_SHORT).show();
+			}
+    	}
     }
     
     public class startListener implements View.OnClickListener {
-    	boolean firstCall=true;
 		public void onClick(View v) {
 			if(!isRunning) {
-				if(firstCall) {
+				if(startlFirstCall) {
 					timer.setBase(SystemClock.elapsedRealtime());
 					timer.start();
-					firstCall = false;
+					startlFirstCall = false;
 					isStarted=true;
 				} else {
 					timer.setBase(SystemClock.elapsedRealtime()-time);

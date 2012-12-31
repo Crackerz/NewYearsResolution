@@ -1,32 +1,10 @@
 package blankenship.william.NewYearsResolution;
 
-import android.os.Bundle;
-import android.app.Activity;
-import android.content.Context;
-import android.view.Menu;
-import android.widget.CalendarView;
-import android.widget.Toast;
+/**
+ * The calendar class is used to store accrued time in the calendar.
+ * @author Crackers
+ *
+ */
+public class Calendar {
 
-public class Calendar extends Activity {
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-    	final Context c = this;
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_calendar);
-        CalendarView cal = (CalendarView) this.findViewById(R.id.calendarView);
-        cal.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
-			
-			public void onSelectedDayChange(CalendarView view, int year, int month,
-					int dayOfMonth) {
-				Toast.makeText(c,month+"/"+dayOfMonth+"/"+year,Toast.LENGTH_SHORT).show();
-			}
-		});
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_calendar, menu);
-        return true;
-    }
 }
