@@ -49,6 +49,9 @@ public class Timer extends Activity {
 			jsonStarted = isStarted;
 			jsonRunning = isRunning;
 			jsonCalendar = calendar;
+			this.day = day;
+			this.month = month;
+			this.year = year;
 		}
 	}
 	
@@ -133,7 +136,7 @@ public class Timer extends Activity {
     			time = timer.getBase();
     	}
     	Gson gson = new Gson();
-    	PersistantData data = new PersistantData(time,isStarted,isRunning, calendar,day,month,year);
+    	PersistantData data = new PersistantData(time,isStarted,isRunning,calendar,day,month,year);
     	String json = gson.toJson(data);
     	fileOutput(json);
     }
