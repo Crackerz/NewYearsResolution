@@ -3,11 +3,27 @@
     android:id="@+id/LinearLayout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/Black"
     android:orientation="vertical" >
 
     <CalendarView
-        android:id="@+id/calendarView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+         android:id="@+id/calendarView"
+         android:layout_width="fill_parent"
+         android:layout_height="fill_parent"
+         android:focusedMonthDateColor="@color/Green"
+         android:selectedWeekBackgroundColor="@color/CalendarWeekBlack"
+         android:unfocusedMonthDateColor="@color/CalendarWeekBlack"
+         android:weekNumberColor="@color/CalendarWeekBlack"
+         android:weekSeparatorLineColor="@color/CalendarWeekBlack"
+         android:selectedDateVerticalBar="@color/CalendarWeekBlack"
+         android:dateTextAppearance="@style/CalendarMonth"
+         android:layout_weight=".2" />
+
+     <TextView
+         android:id="@+id/calText"
+         android:layout_width="fill_parent"
+         android:layout_height="fill_parent"
+         android:layout_weight=".8"
+         android:text="Hello World" />
 
 </LinearLayout>

@@ -1,7 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:background="@color/Black" >
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -14,6 +15,7 @@
             android:id="@+id/timer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/Green"
             android:textSize="40dp" />
 
         <LinearLayout
@@ -57,21 +59,29 @@
             android:id="@+id/content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#FFFFFF"
+            android:background="@color/Black"
             android:orientation="vertical" >
 
             <CalendarView
-                android:id="@+id/calendarView"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_weight=".2" />
+		         android:id="@+id/calendarView"
+		         android:layout_width="fill_parent"
+		         android:layout_height="fill_parent"
+		         android:focusedMonthDateColor="@color/Green"
+		         android:selectedWeekBackgroundColor="@color/CalendarWeekBlack"
+		         android:unfocusedMonthDateColor="@color/CalendarWeekBlack"
+		         android:weekNumberColor="@color/CalendarWeekBlack"
+		         android:weekSeparatorLineColor="@color/CalendarWeekBlack"
+		         android:selectedDateVerticalBar="@color/Green"
+		         android:weekDayTextAppearance="@style/CalendarMonth"
+		         android:layout_weight=".2" />
 
             <TextView
                 android:id="@+id/calText"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_weight=".8"
-                android:text="Hello World" />
+                android:textColor="@color/Green"
+                android:textSize="20dp" />
 
         </LinearLayout>
     </SlidingDrawer>
