@@ -2,10 +2,21 @@
 
     <string name="app_name">New Years Resolution</string>
     <string name="hello_world">Hello world!</string>
-    <string name="menu_settings">Settings</string>
+    <string name="menu_about">About App</string>
     <string name="title_activity_calendar">Calendar</string>
     <string name="SwitchToCalendar">View Calendar</string>
     <string name="SwitchToTheTimer">View Timer</string>
     <string name="title_activity_timer">Timer</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_about_us">AboutUS</string>
+    <string name="aboutUs">
+        Member of the Better Apps Coalition.\n\n
+        Author: William J. Blankenship\n
+        Age: 20\n
+        Email: william.jblankenship@gmail.com\n\n
+        
+        License: The MIT License (<a href="http://opensource.org/licenses/MIT">http://opensource.org/licenses/MIT</a>)\n
+        Source Code: 
+    </string>
 
 </resources>

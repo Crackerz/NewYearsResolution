@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.Calendar;
 
 import com.google.gson.Gson;
@@ -15,7 +16,9 @@ import android.os.Environment;
 import android.os.SystemClock;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CalendarView;
@@ -36,6 +39,7 @@ public class Timer extends Activity {
 	 * @author Crackers
 	 */
 	public class PersistantData {
+		public double version = 1;
 		public long jsonTime;
 		public boolean jsonStarted;
 		public boolean jsonRunning;
@@ -92,12 +96,19 @@ public class Timer extends Activity {
         timer = (Chronometer) findViewById(R.id.timer);
 		String value = timer.getText().toString();
         timer.setText(padTime(value));
+        Calendar initDate = Calendar.getInstance();
+        cal.setDate(initDate.getTimeInMillis(),false,true);
+        setCalendarText(calText, initDate.get(Calendar.DAY_OF_MONTH), initDate.get(Calendar.MONTH), initDate.get(Calendar.YEAR));
+//        initDate.set(calendar.getYear(), Calendar.DECEMBER, 31);
+//        cal.setMaxDate(initDate.getTimeInMillis());
+//        initDate.set(calendar.getYear(), Calendar.JANUARY, 1);
+//        cal.setMinDate(initDate.getTimeInMillis());
 
         //Set listeners
         cal.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
 			public void onSelectedDayChange(CalendarView view, int year, int month,
 					int dayOfMonth) {
-				calText.setText("Goal: 2 Hours\nAccomplished: "+calendar.getValue(dayOfMonth, month, year)/3600000.0 + " Hours");
+				setCalendarText(calText,dayOfMonth,month,year);
 			}
 		});
         
@@ -126,6 +137,15 @@ public class Timer extends Activity {
         start.setOnClickListener(startl);
         
         pause.setOnClickListener(stopl);
+    }
+    
+    public void setCalendarText(TextView calText, int day, int month, int year) {
+    	DecimalFormat df = new DecimalFormat("#.##");
+		calText.setText(
+				(month+1)+"/"+day+"/"+year+"\n" +
+				"Goal: 2 Hours\n" +
+				"Accomplished: "+df.format(calendar.getValue(day, month, year)/3600000.0)+" Hours"
+				);
     }
     
     @Override
@@ -263,7 +283,24 @@ public class Timer extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        //getMenuInflater().inflate(R.menu.activity_timer, menu);
+        getMenuInflater().inflate(R.menu.activity_timer, menu);
         return true;
+    }
+    
+    public void launchAboutUs() {
+    	Intent i = new Intent(this, AboutUS.class);
+    	startActivity(i);
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.menu_about:
+                launchAboutUs();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
